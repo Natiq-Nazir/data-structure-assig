@@ -33,7 +33,33 @@ struct Node *createList(int n) {
     return head;
 }
 
+struct Node *insertAtBeginning(struct Node *head) {
+    int val;
+    scanf("%d", &val);
+    struct Node *node = createNode(val);
+    if (!head) { node->next = node->prev = node; return node; }
+    struct Node *tail = head->prev;
+    node->next = head;
+    node->prev = tail;
+    tail->next = head->prev = node;
+    return node;
+}
 
+
+
+struct Node *deleteAtBeginning(struct Node *head) {
+    if (!head) return NULL;
+    if (head->next == head) { free(head); return NULL; }
+    struct Node *tail = head->prev;
+    struct Node *temp = head;
+    head = head->next;
+    tail->next = head;
+    head->prev = tail;
+    free(temp);
+    return head;
+}
+
+ 
 
 void display(struct Node *head) {
     if (!head) { printf("NULL\n"); return; }
@@ -49,7 +75,10 @@ int main() {
     int n;
     scanf("%d", &n);
     struct Node *head = createList(n);
- 
+    head = insertAtBeginning(head);
+  
+    head = deleteAtBeginning(head);
+  
     display(head);
     return 0;
 }
