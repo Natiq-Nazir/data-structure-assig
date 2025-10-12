@@ -47,55 +47,22 @@ struct Node *createList(int n)
     return head;
 }
 
-struct Node *insertAtBeginning(struct Node *head)
+struct Node *deletionAtBeginning(struct Node *head)
 {
-
-    int val;
-    printf("Enter the value which you want to insert: ");
-    scanf("%d", &val);
-
     struct Node *temp = head;
-    struct Node *newNode = createNode(val);
     if (head == NULL)
     {
-        newNode->next = head;
-        head = newNode;
-        return head;
+        printf("Linked List is empty\n");
+        return NULL;
     }
-
     while (temp->next != head)
     {
         temp = temp->next;
     }
-    newNode->next = head;
-    temp->next = newNode;
-    head = newNode;
-
-    return head;
-}
-
-struct Node *insertAtEnd(struct Node *head)
-{
-    int val;
-    printf("Enter the value which you want to insert: ");
-    scanf("%d", &val);
-
-    struct Node *newNode = createNode(val);
-    if (head == NULL)
-    {
-        head = newNode;
-        head->next = head;
-        return head;
-    }
-    struct Node *temp = head;
-    while (temp->next != head)
-    {
-        temp = temp->next;
-    }
-    temp->next = newNode;
-
-    newNode->next = head;
-    return head;
+    printf("node deleted \n");
+    temp->next = head->next;
+    head->next = NULL;
+    head = temp->next;
 }
 
 void display(struct Node *head)
@@ -122,8 +89,7 @@ int main()
     scanf("%d", &n);
 
     head = createList(n);
-
-    head = insertAtEnd(head);
+    head = deletionAtBeginning(head);
     display(head);
 
     return 0;
