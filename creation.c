@@ -1,78 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node
-{
+struct Node {
     int data;
     struct Node *next;
+    struct Node *prev;
 };
 
-struct Node *createNode(int val)
-{
+struct Node *createNode(int val) {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = val;
-    newNode->next = NULL;
+    newNode->next = newNode->prev = NULL;
     return newNode;
 }
 
-struct Node *createList(int n)
-{
-    struct Node *head = NULL;
-    struct Node *temp = NULL;
-    int nodeElem;
-    for (int i = 0; i < n; i++)
-    {
-        printf("Enter the data for Node no %d: ", i + 1);
-        scanf("%d", &nodeElem);
-
-        struct Node *newNode = createNode(nodeElem);
-
-        if (head == NULL)
-        {
-            head = newNode;
-
-            temp = head;
-        }
-        else
-        {
-            temp->next = newNode;
-            temp = newNode;
+struct Node *createList(int n) {
+    if (n == 0) return NULL;
+    struct Node *head = NULL, *tail = NULL;
+    int val;
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &val);
+        struct Node *node = createNode(val);
+        if (!head) head = tail = node;
+        else {
+            tail->next = node;
+            node->prev = tail;
+            tail = node;
         }
     }
-    if (temp != NULL)
-    {
-        temp->next = head;
-    }
-
+    head->prev = tail;
+    tail->next = head;
     return head;
 }
 
-void display(struct Node *head)
-{
-    if (head == NULL)
-    {
-        printf("Linked List is empty\n");
-    }
 
+
+void display(struct Node *head) {
+    if (!head) { printf("NULL\n"); return; }
     struct Node *temp = head;
-    do
-    {
-        printf("%d -> ", temp->data);
+    do {
+        printf("%d <-> ", temp->data);
         temp = temp->next;
     } while (temp != head);
     printf("(Back to head)\n");
 }
 
-int main()
-{
+int main() {
     int n;
-    struct Node *head = NULL;
-    printf("Enter the Number of Nodes: ");
     scanf("%d", &n);
-
-    head = createList(n);
-
+    struct Node *head = createList(n);
+ 
     display(head);
-
     return 0;
 }

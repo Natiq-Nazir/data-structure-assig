@@ -1,137 +1,97 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node
-{
+struct Node {
     int data;
     struct Node *next;
+    struct Node *prev;
 };
 
-struct Node *createNode(int val)
-{
+struct Node *createNode(int val) {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = val;
-    newNode->next = NULL;
+    newNode->next = newNode->prev = NULL;
     return newNode;
 }
 
-struct Node *createList(int n)
-{
-    struct Node *head = NULL;
-    struct Node *temp = NULL;
-    int nodeElem;
-    for (int i = 0; i < n; i++)
-    {
-        printf("Enter the data for Node no %d: ", i + 1);
-        scanf("%d", &nodeElem);
-
-        struct Node *newNode = createNode(nodeElem);
-
-        if (head == NULL)
-        {
-            head = newNode;
-
-            temp = head;
-        }
-        else
-        {
-            temp->next = newNode;
-            temp = newNode;
-        }
-    }
-    if (temp != NULL)
-    {
-        temp->next = head;
-    }
-
-    return head;
-}
-struct Node *insertAtBeginning(struct Node *head)
-{
-
+struct Node *createList(int n) {
+    if (n == 0) return NULL;
+    struct Node *head = NULL, *tail = NULL;
     int val;
-    printf("Enter the value which you want to insert: ");
-    scanf("%d", &val);
-
-    struct Node *temp = head;
-    struct Node *newNode = createNode(val);
-    if (head == NULL)
-    {
-        newNode->next = newNode;
-        head = newNode;
-        return head;
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &val);
+        struct Node *node = createNode(val);
+        if (!head) head = tail = node;
+        else {
+            tail->next = node;
+            node->prev = tail;
+            tail = node;
+        }
     }
-
-    while (temp->next != head)
-    {
-        temp = temp->next;
-    }
-    newNode->next = head;
-    temp->next = newNode;
-    head = newNode;
-
+    head->prev = tail;
+    tail->next = head;
     return head;
 }
-struct Node *insertionAtAnyPos(struct Node *head)
-{
+
+struct Node *insertAtBeginning(struct Node *head) {
+    int val;
+    scanf("%d", &val);
+    struct Node *node = createNode(val);
+    if (!head) { node->next = node->prev = node; return node; }
+    struct Node *tail = head->prev;
+    node->next = head;
+    node->prev = tail;
+    tail->next = head->prev = node;
+    return node;
+}
+
+struct Node *insertAtEnd(struct Node *head) {
+    int val;
+    scanf("%d", &val);
+    struct Node *node = createNode(val);
+    if (!head) { node->next = node->prev = node; return node; }
+    struct Node *tail = head->prev;
+    tail->next = node;
+    node->prev = tail;
+    node->next = head;
+    head->prev = node;
+    return head;
+}
+
+struct Node *insertAtAnyPos(struct Node *head) {
     int val, pos;
-
-    printf("Enter the position at which you want to insert: ");
-    scanf("%d", &pos);
-
-    printf("Enter the value you want to insert: ");
-    scanf("%d", &val);
-
-    struct Node *newNode = createNode(val);
-    if (head == NULL)
-    {
-        head = newNode;
-        head->next = head;
-        return head;
-    }
+    scanf("%d %d", &pos, &val);
+    struct Node *node = createNode(val);
+    if (!head || pos == 1) return insertAtBeginning(head);
     struct Node *temp = head;
-    if (pos == 1)
-    {
-        head = insertAtBeginning(head);
-        return head;
-    }
     for (int i = 1; i < pos - 1 && temp->next != head; i++)
-    {
         temp = temp->next;
-    }
-
-    newNode->next = temp->next;
-    temp->next = newNode;
+    node->next = temp->next;
+    node->prev = temp;
+    temp->next->prev = node;
+    temp->next = node;
     return head;
 }
 
-void display(struct Node *head)
-{
-    if (head == NULL)
-    {
-        printf("Linked List is empty\n");
-    }
 
+void display(struct Node *head) {
+    if (!head) { printf("NULL\n"); return; }
     struct Node *temp = head;
-    do
-    {
-        printf("%d -> ", temp->data);
+    do {
+        printf("%d <-> ", temp->data);
         temp = temp->next;
     } while (temp != head);
     printf("(Back to head)\n");
 }
 
-int main()
-{
+int main() {
     int n;
-    struct Node *head = NULL;
-    printf("Enter the Number of Nodes: ");
     scanf("%d", &n);
-
-    head = createList(n);
-
-    head = insertionAtAnyPos(head);
+    struct Node *head = createList(n);
+    head = insertAtBeginning(head);
+    head = insertAtEnd(head);
+    head = insertAtAnyPos(head);
+ 
     display(head);
-
     return 0;
 }

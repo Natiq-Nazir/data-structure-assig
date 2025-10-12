@@ -1,96 +1,122 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node
-{
+struct Node {
     int data;
     struct Node *next;
+    struct Node *prev;
 };
 
-struct Node *createNode(int val)
-{
+struct Node *createNode(int val) {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = val;
-    newNode->next = NULL;
+    newNode->next = newNode->prev = NULL;
     return newNode;
 }
 
-struct Node *createList(int n)
-{
-    struct Node *head = NULL;
-    struct Node *temp = NULL;
-    int nodeElem;
-    for (int i = 0; i < n; i++)
-    {
-        printf("Enter the data for Node no %d: ", i + 1);
-        scanf("%d", &nodeElem);
-
-        struct Node *newNode = createNode(nodeElem);
-
-        if (head == NULL)
-        {
-            head = newNode;
-
-            temp = head;
-        }
-        else
-        {
-            temp->next = newNode;
-            temp = newNode;
+struct Node *createList(int n) {
+    if (n == 0) return NULL;
+    struct Node *head = NULL, *tail = NULL;
+    int val;
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &val);
+        struct Node *node = createNode(val);
+        if (!head) head = tail = node;
+        else {
+            tail->next = node;
+            node->prev = tail;
+            tail = node;
         }
     }
-    if (temp != NULL)
-    {
-        temp->next = head;
-    }
-
+    head->prev = tail;
+    tail->next = head;
     return head;
 }
 
-struct Node *deletionAtEnd(struct Node *head)
-{
+struct Node *insertAtBeginning(struct Node *head) {
+    int val;
+    scanf("%d", &val);
+    struct Node *node = createNode(val);
+    if (!head) { node->next = node->prev = node; return node; }
+    struct Node *tail = head->prev;
+    node->next = head;
+    node->prev = tail;
+    tail->next = head->prev = node;
+    return node;
+}
+
+struct Node *insertAtEnd(struct Node *head) {
+    int val;
+    scanf("%d", &val);
+    struct Node *node = createNode(val);
+    if (!head) { node->next = node->prev = node; return node; }
+    struct Node *tail = head->prev;
+    tail->next = node;
+    node->prev = tail;
+    node->next = head;
+    head->prev = node;
+    return head;
+}
+
+struct Node *insertAtAnyPos(struct Node *head) {
+    int val, pos;
+    scanf("%d %d", &pos, &val);
+    struct Node *node = createNode(val);
+    if (!head || pos == 1) return insertAtBeginning(head);
     struct Node *temp = head;
-    struct Node *prev = NULL;
+    for (int i = 1; i < pos - 1 && temp->next != head; i++)
+        temp = temp->next;
+    node->next = temp->next;
+    node->prev = temp;
+    temp->next->prev = node;
+    temp->next = node;
+    return head;
+}
 
-    while (temp->next != head)
-    {
-        prev = temp;
-        temp = (*temp).next;
-    }
-
-    prev->next = head;
-
-    printf("\nLast Node deleted with value %d \n", temp->data);
+struct Node *deleteAtBeginning(struct Node *head) {
+    if (!head) return NULL;
+    if (head->next == head) { free(head); return NULL; }
+    struct Node *tail = head->prev;
+    struct Node *temp = head;
+    head = head->next;
+    tail->next = head;
+    head->prev = tail;
     free(temp);
     return head;
 }
 
-void display(struct Node *head)
-{
-    if (head == NULL)
-    {
-        printf("Linked List is empty\n");
-    }
+struct Node *deleteAtEnd(struct Node *head) {
+    if (!head) return NULL;
+    if (head->next == head) { free(head); return NULL; }
+    struct Node *tail = head->prev;
+    struct Node *prev = tail->prev;
+    prev->next = head;
+    head->prev = prev;
+    free(tail);
+    return head;
+}
 
+
+void display(struct Node *head) {
+    if (!head) { printf("NULL\n"); return; }
     struct Node *temp = head;
-    do
-    {
-        printf("%d -> ", temp->data);
+    do {
+        printf("%d <-> ", temp->data);
         temp = temp->next;
     } while (temp != head);
     printf("(Back to head)\n");
 }
 
-int main()
-{
+int main() {
     int n;
-    struct Node *head = NULL;
-    printf("Enter the Number of Nodes: ");
     scanf("%d", &n);
-
-    head = createList(n);
-    head = deletionAtEnd(head);
+    struct Node *head = createList(n);
+    head = insertAtBeginning(head);
+    head = insertAtEnd(head);
+    head = insertAtAnyPos(head);
+    head = deleteAtBeginning(head);
+    head = deleteAtEnd(head);
+    
     display(head);
-
     return 0;
 }
